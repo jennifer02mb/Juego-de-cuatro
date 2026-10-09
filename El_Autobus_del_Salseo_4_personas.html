@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#e85d8d"><meta name="apple-mobile-web-app-capable" content="yes">
+<title>El Autobús del Salseo 2.0</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(160deg,#fff7f3,#ffe8f0);color:#3b2630}.wrap{max-width:620px;margin:auto;padding:18px 15px 40px}.hero{text-align:center}.bus{font-size:54px}.hero h1{margin:0;font-size:29px}.card{background:#fff;border-radius:24px;padding:18px;margin:13px 0;box-shadow:0 8px 25px #6b344018}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}input,button{font:inherit;border-radius:14px;padding:13px;width:100%}input{border:1px solid #ead5dc}button{border:0;background:#e85d8d;color:#fff;font-weight:700;margin-top:8px}button.alt{background:#fff0f5;color:#e85d8d;border:1px solid #ffc4d8}button.dark{background:#3b2630}button.gold{background:#f5bd54;color:#3d2c14}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}.stat{background:#fff7f3;border-radius:16px;padding:10px}.stat b{display:block;font-size:20px}.mission{background:#fff0f6;border:2px solid #ffd0df;border-radius:20px;padding:16px}.tag{display:inline-block;padding:5px 9px;border-radius:999px;background:#ffe3ec;font-size:12px;font-weight:800}.power{padding:12px;border-radius:17px;background:#fff8fa;margin:8px 0}.power b{display:block}.question{font-size:21px;line-height:1.3;margin:8px 0}.secret{background:#30242a;color:#fff;border-radius:20px;padding:18px;text-align:center}.scoreRow{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #f1e4e8}.score{font-weight:900;font-size:22px}.small{font-size:13px;opacity:.7}.hidden{display:none!important}.end{text-align:center}
+</style></head><body><div class="wrap">
+<header class="hero"><div class="bus">🚌💋</div><h1>El Autobús del Salseo</h1><p>4 personas · cartas físicas · 10 rondas · cero castigos 🍸</p></header>
+
+<section id="setup" class="card"><h2>👯‍♀️ ¿Quién va en el autobús?</h2>
+<div class="grid"><input id="p1" placeholder="Persona 1" value="Jennifel"><input id="p2" placeholder="Persona 2" value="Persona 2"><input id="p3" placeholder="Persona 3" value="Persona 3"><input id="p4" placeholder="Persona 4" value="Persona 4"></div>
+<button onclick="start()">🚌 Arrancar el autobús</button><p class="small">Usad vuestra baraja española de 40 cartas. Con 4 personas: repartid 10 cartas a cada una. La app solo lleva rondas, misiones, preguntas y puntos.</p></section>
+
+<section id="game" class="hidden">
+<div class="card"><div class="stats"><div class="stat">Ronda<b id="round">1/10</b></div><div class="stat">Turno<b id="turn">—</b></div><div class="stat">Fichas 🩷<b id="tokens">0/3</b></div></div></div>
+
+<div class="card"><h2>🎯 Misión</h2><div id="mission" class="mission"></div><button onclick="completeRound()">✅ Misión conseguida</button><button class="alt" onclick="showAlternative()">🔄 Ver otra</button></div>
+
+<div class="card"><h2>🃏 Poderes de las figuras</h2>
+<div class="power"><b>🧑‍✈️ Sota — ESPÍA</b>Mira 2 cartas de una rival.</div>
+<div class="power"><b>🐴 Caballo — BLOQUEO</b>Elige una rival: no puede coger el descarte en su próximo turno.</div>
+<div class="power"><b>👑 Rey — INTERCAMBIO</b>Intercambia 1 carta con una rival sin mirar previamente.</div>
+<div class="power"><b>🅰️ As — PREGUNTA</b>La jugadora que lo usa responde una pregunta secreta.</div>
+<button class="gold" onclick="figure()">✨ Me ha salido una figura</button><div id="figureMsg" class="small"></div></div>
+
+<div class="card"><h2>💥 Te pillo</h2><p class="small">Si crees que otra intenta completar una combinación, pulsa el botón. La señalada enseña una carta de esa combinación.</p><button class="dark" onclick="pill()">👀 ¡TE PILLO!</button><div id="pillMsg" class="small"></div></div>
+
+<div class="card"><h2>💬 Salseo de la ronda</h2><div id="qbox" class="question">Pulsa para sacar una pregunta.</div><button onclick="question()">💬 Pregunta para todas</button><button class="alt" onclick="secret()">📱 Pregunta secreta</button></div>
+<div id="secretBox" class="card hidden secret"><div>📱 Solo mira la persona cuyo turno es</div><div id="secretQ" class="question"></div><button onclick="closeSecret()">🙈 Ya está</button></div>
+
+<div class="card"><h2>🏆 Puntuación</h2><div id="scores"></div></div><div class="card"><h2>📖 Cómo se juega</h2>
+<p><b>1. Reparto:</b> usad una baraja española de 40 cartas y repartid 10 cartas a cada persona. No queda mazo.</p>
+<p><b>2. Turno:</b> empieza la persona indicada por la app. En cada turno, roba 1 carta del mazo común preparado aparte o del descarte, intenta formar la combinación de la misión y descarta 1 carta.</p>
+<p><b>3. Combinaciones:</b> <b>trío</b> = 3 cartas del mismo número; <b>cuarteto</b> = 4 iguales; <b>escalera</b> = cartas consecutivas del mismo palo.</p>
+<p><b>4. Cerrar:</b> cuando tengas exactamente las combinaciones que pide la misión, pulsa <b>«Misión conseguida»</b>. Ganas los puntos de esa ronda.</p>
+<p><b>5. Figuras:</b> si aparece Sota, Caballo, Rey o As, usa su poder cuando corresponda. La app te recuerda cuál es.</p>
+<p><b>6. Te pillo:</b> si crees que alguien está a punto de cerrar, puedes señalarle. Debe enseñar 1 carta de la combinación que está intentando formar.</p>
+<p><b>7. Salseo:</b> podéis sacar preguntas durante la ronda. Las preguntas verdes son ligeras, las amarillas más personales y las rojas más profundas.</p>
+<p><b>8. Final:</b> después de 10 rondas, gana quien tenga más puntos. Si entre todas conseguís las 3 fichas de salseo, se añaden <b>+5 puntos</b> al final.</p>
+<p class="small"><b>Importante:</b> la app lleva las rondas, misiones, preguntas y puntuación; las cartas las manejáis físicamente.</p>
+</div>
+<div class="card"><h3>📜 Recordatorio</h3><p class="small">En tu turno: ROBAS 1 → intentas mejorar tu mano → DESCARTAS 1. Para cerrar la ronda debes cumplir la misión. Al completar una ronda se suman sus puntos y cambia el turno.</p><p class="small"><b>Fichas de salseo:</b> durante la partida pueden aparecer hasta 3. Si conseguís las 3, el final añade +5 puntos al total de la partida.</p></div>
+<button class="alt" onclick="restart()">🔁 Jugar otra vez con las mismas amigas</button></section>
+
+<section id="end" class="hidden card end"><div class="bus">🏁🚌</div><h2>¡Fin del Autobús!</h2><div id="final"></div><button onclick="restart()">🔁 Otra partida</button></section>
+</div>
+
+<script>
+const missions=[
+["🟢 Verde","1 trío + 1 pareja",5],["🟢 Verde","1 escalera de 4 + 1 trío",5],["🟢 Verde","2 tríos",5],
+["🟡 Amarillo","1 escalera de 5",6],["🟡 Amarillo","1 trío + 1 escalera de 3",6],["🟡 Amarillo","2 escaleras de 3",6],
+["🔴 Rojo","1 cuarteto + 1 escalera de 3",7],["🔴 Rojo","1 escalera de 6 + 1 trío",7],["🔴 Rojo","10 cartas formando combinaciones válidas",8],["🔴 Rojo","1 escalera de 5 + 1 trío + 1 pareja",10]];
+const qs={green:["¿Qué recuerdo nuestro te hace reír siempre?","¿Qué fue lo primero que pensaste de cada una?","¿Qué plan absurdo haríamos juntas?","¿Qué canción nos representa?","¿Qué pequeña cosa te alegra muchísimo?","¿Qué secreto tonto nunca habías contado?","¿Qué viaje haríamos mañana?","¿Cuál ha sido nuestro momento más random?","¿Qué apodo le pondrías a cada una?","¿Qué echas de menos de cuando estábamos más unidas?"],
+yellow:["¿Qué necesitas más de tus amigas últimamente?","¿Qué te cuesta decir cuando estás mal?","¿Cuándo te has sentido realmente comprendida?","¿Qué hábito tuyo quieres cambiar?","¿Qué te gustaría recuperar de nuestra amistad?","¿Qué te da miedo perder?","¿Qué haces cuando necesitas espacio?","¿Qué gesto de una amiga valoras muchísimo?","¿Qué te gustaría que supiéramos sin preguntarlo?","¿Qué te gustaría vivir juntas este año?"],
+red:["¿Hay algo que hayas callado para no generar conflicto?","¿Qué parte de ti pocas personas conocen?","¿Qué herida te ha cambiado como amiga?","¿Qué necesitas escuchar cuando estás mal?","¿Alguna vez te has sentido sola estando acompañada?","¿Qué límite te cuesta poner?","¿Qué te gustaría que las demás entendieran mejor de ti?","¿Qué conversación pendiente merecéis tener?","¿Qué te da más miedo en una amistad?","¿Qué promesa realista os haríais para cuidar esta amistad?"]};
+let players=[],r=1,t=0,s=[0,0,0,0],done=new Set(),tokens=0;
+const $=id=>document.getElementById(id);
+function start(){players=[$("p1").value.trim()||"Persona 1",$("p2").value.trim()||"Persona 2",$("p3").value.trim()||"Persona 3",$("p4").value.trim()||"Persona 4"];r=1;t=0;s=[0,0,0,0];done=new Set();tokens=0;$("setup").classList.add("hidden");$("game").classList.remove("hidden");$("end").classList.add("hidden");render()}
+function render(){$("round").textContent=r+"/10";$("turn").textContent=players[t];$("tokens").textContent=tokens+"/3";let m=missions[r-1];$("mission").innerHTML='<span class="tag">'+m[0]+'</span><h3>'+m[1]+'</h3><div>🏆 +'+m[2]+' puntos</div>';$("scores").innerHTML=players.map((p,i)=>'<div class="scoreRow"><span>'+p+(i===t?' 👈':'')+'</span><span class="score">'+s[i]+'</span></div>').join("")}
+function completeRound(){if(done.has(r)){alert("Esta ronda ya está completada 💗");return}done.add(r);s[t]+=missions[r-1][2];if(tokens<3&&Math.random()<.45)tokens++;if(r<10){r++;t=(t+1)%4;render();question()}else finish()}
+function showAlternative(){let m=missions[Math.floor(Math.random()*missions.length)];$("mission").innerHTML='<span class="tag">'+m[0]+'</span><h3>'+m[1]+'</h3><div>🏆 +'+m[2]+' puntos</div><div class="small">Es una alternativa opcional.</div>'}
+function figure(){let a=["🧑‍✈️ SOTA: elige una rival y mira 2 cartas.","🐴 CABALLO: elige una rival; no puede coger el descarte en su próximo turno.","👑 REY: intercambia 1 carta con una rival sin mirar previamente.","🅰️ AS: pulsa «Pregunta secreta» y responde tú sola."];$("figureMsg").textContent=a[Math.floor(Math.random()*a.length)]}
+function pill(){let x=players[(t+1+Math.floor(Math.random()*3))%4];$("pillMsg").textContent="👀 "+x+", te han pillado. Enseña 1 carta de la combinación que estés intentando formar."}
+function pool(){return r<=3?qs.green:r<=6?qs.yellow:qs.red}
+function question(){$("qbox").textContent=pool()[Math.floor(Math.random()*pool().length)]}
+function secret(){$("secretQ").textContent=pool()[Math.floor(Math.random()*pool().length)];$("secretBox").classList.remove("hidden")}
+function closeSecret(){$("secretBox").classList.add("hidden")}
+function finish(){$("game").classList.add("hidden");$("end").classList.remove("hidden");let bonus=tokens===3?5:0;$("final").innerHTML=players.map((p,i)=>'<div class="scoreRow"><span>'+p+'</span><span class="score">'+(s[i]+bonus)+'</span></div>').join("")+'<p class="small">'+(bonus?"+5 puntos por conseguir las 3 fichas de salseo.":"No se consiguieron las 3 fichas de salseo.")+'</p>'}
+function restart(){start()}
+</script></body></html>
